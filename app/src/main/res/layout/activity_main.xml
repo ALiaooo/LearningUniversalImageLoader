@@ -13,5 +13,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="线程池的基本使用"/>
+    <Button
+        android:id="@+id/btn_memorycache"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="使用memorycache缓存请求的图片"/>
 
 </RelativeLayout>

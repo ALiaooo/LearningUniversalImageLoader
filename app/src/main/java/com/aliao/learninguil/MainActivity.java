@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.aliao.learninguil.activity.ExecutorTestActivity;
+import com.aliao.learninguil.activity.LoadImgByMemoryCacheActivity;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findViewById(R.id.btn_executor).setOnClickListener(this);
+        findViewById(R.id.btn_memorycache).setOnClickListener(this);
     }
 
     @Override
@@ -48,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             case R.id.btn_executor:
                 startActivity(new Intent(MainActivity.this, ExecutorTestActivity.class));
+                break;
+            case R.id.btn_memorycache:
+                startActivity(new Intent(MainActivity.this, LoadImgByMemoryCacheActivity.class));
                 break;
         }
     }
