@@ -11,7 +11,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
- * Created by ÀöË« on 2015/6/25.
+ * Created by ä¸½åŒ on 2015/6/25.
  */
 public class ExecutorTestActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -36,11 +36,11 @@ public class ExecutorTestActivity extends AppCompatActivity implements View.OnCl
     private void executorTest() {
 
         /**
-         * newFixedThreadPool·µ»ØÒ»¸ö°üº¬Ö¸¶¨ÊıÄ¿Ïß³ÌµÄÏß³Ì³Ø£¬Èç¹ûÈÎÎñÊıÁ¿¶àÓÚÏß³ÌÊıÄ¿£¬ÄÇÃ´Ã»ÓĞÃ»ÓĞÖ´ĞĞµÄÈÎÎñ±ØĞëµÈ´ı£¬Ö±µ½ÓĞÈÎÎñÍê³ÉÎªÖ¹
+         * newFixedThreadPoolè¿”å›ä¸€ä¸ªåŒ…å«æŒ‡å®šæ•°ç›®çº¿ç¨‹çš„çº¿ç¨‹æ± ï¼Œå¦‚æœä»»åŠ¡æ•°é‡å¤šäºçº¿ç¨‹æ•°ç›®ï¼Œé‚£ä¹ˆæ²¡æœ‰æ²¡æœ‰æ‰§è¡Œçš„ä»»åŠ¡å¿…é¡»ç­‰å¾…ï¼Œç›´åˆ°æœ‰ä»»åŠ¡å®Œæˆä¸ºæ­¢
          */
         Executor executor = Executors.newFixedThreadPool(2);
         /**
-         * newCachedThreadPool¸ù¾İÓÃ»§µÄÈÎÎñÊı´´½¨ÏàÓ¦µÄÏß³ÌÀ´´¦Àí£¬¸ÃÏß³Ì³Ø²»»á¶ÔÏß³ÌÊıÄ¿¼ÓÒÔÏŞÖÆ£¬ÍêÈ«ÒÀÀµÓÚJVMÄÜ´´½¨Ïß³ÌµÄÊıÁ¿£¬¿ÉÄÜÒıÆğÄÚ´æ²»×ã¡£
+         * newCachedThreadPoolæ ¹æ®ç”¨æˆ·çš„ä»»åŠ¡æ•°åˆ›å»ºç›¸åº”çš„çº¿ç¨‹æ¥å¤„ç†ï¼Œè¯¥çº¿ç¨‹æ± ä¸ä¼šå¯¹çº¿ç¨‹æ•°ç›®åŠ ä»¥é™åˆ¶ï¼Œå®Œå…¨ä¾èµ–äºJVMèƒ½åˆ›å»ºçº¿ç¨‹çš„æ•°é‡ï¼Œå¯èƒ½å¼•èµ·å†…å­˜ä¸è¶³ã€‚
          */
 //        Executor executor = Executors.newCachedThreadPool();
         executor.execute(new MyRunnable());

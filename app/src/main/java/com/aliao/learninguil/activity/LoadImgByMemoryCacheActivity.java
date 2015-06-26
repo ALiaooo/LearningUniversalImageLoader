@@ -5,11 +5,15 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.aliao.learninguil.App;
 import com.aliao.learninguil.R;
+import com.aliao.learninguil.utils.CacheUtil;
+import com.aliao.learninguil.utils.L;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,12 +24,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
- * Created by ¿ˆÀ´ on 2015/6/25.
+ * Created by ‰∏ΩÂèå on 2015/6/25.
  */
 public class LoadImgByMemoryCacheActivity extends AppCompatActivity implements View.OnClickListener {
 
     private String mImageUrl = "http://car0.autoimg.cn/upload/spec/5742/w_20101014155156565264.jpg";
     private ImageView mImageView;
+    private LruCache<String, Bitmap> mLruCache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,12 @@ public class LoadImgByMemoryCacheActivity extends AppCompatActivity implements V
         setContentView(R.layout.activity_memorycache);
         findViewById(R.id.btn_loadimage).setOnClickListener(this);
         mImageView = (ImageView) findViewById(R.id.iv_showimg);
+
+        int maxMemory = CacheUtil.getAvailableMaxMemeryCache();
+        int cacheSize = maxMemory / 8;//‰ΩøÁî®ÊúÄÂ§ßÂèØÁî®ÂÜÖÂ≠òÁöÑ1/8‰Ωú‰∏∫ÁºìÂ≠òÂ§ßÂ∞è
+        L.d("max memory cache = "+ (CacheUtil.getAvailableMaxMemeryCache()/1024)+"M"+" , memory cache = "+(cacheSize/1024)+"M");
+        mLruCache = App.getLruCache();//new LruCache<>(cacheSize);
+        showImage();
     }
 
     @Override
@@ -45,12 +56,19 @@ public class LoadImgByMemoryCacheActivity extends AppCompatActivity implements V
     }
 
     private void showImage() {
-        //œ»≈–∂œƒ⁄¥Ê¿Ô”–√ª”–Õº∆¨£¨»Áπ˚√ª”–»•Õ¯¬Á«Î«Û
-         Bitmap bitmap = getBitmapFromMemoryCache("");
+        //ÂÖàÂà§Êñ≠ÂÜÖÂ≠òÈáåÊúâÊ≤°ÊúâÂõæÁâáÔºåÂ¶ÇÊûúÊ≤°ÊúâÂéªÁΩëÁªúËØ∑Ê±Ç
+        Bitmap bitmap = getBitmapFromMemoryCache(mImageUrl);
         if (bitmap != null){
             mImageView.setImageBitmap(bitmap);
         }else {
-            //ƒ⁄¥Ê¿Ô√ª”–Õº∆¨£¨»•Õ¯¬Á«Î«ÛÕº∆¨
+
+            /**
+             * 1.ÈÄöËøáÁΩëÁªúËØ∑Ê±ÇÂõæÁâá
+             * 2.ÊòæÁ§∫ÂõæÁâá
+             * 3.Â≠òÂÇ®Âú®ÂÜÖÂ≠òÁºìÂ≠ò‰∏≠
+             */
+
+
             new LoadImageTask().execute();
 //            requestImage();
 
@@ -75,36 +93,21 @@ public class LoadImgByMemoryCacheActivity extends AppCompatActivity implements V
             super.onPostExecute(bitmap);
             if (null != bitmap){
                 mImageView.setImageBitmap(bitmap);
+                addBitmapToMemeryCache(bitmap);
             }
         }
     }
 
-    public static Bitmap getNetWorkBitmap(String urlString) {
-        URL imgUrl = null;
-        Bitmap bitmap = null;
-        try {
-            imgUrl = new URL(urlString);
-            //  π”√HttpURLConnection¥Úø™¡¨Ω”
-            HttpURLConnection urlConn = (HttpURLConnection) imgUrl
-                    .openConnection();
-            urlConn.setDoInput(true);
-            urlConn.connect();
-            // Ω´µ√µΩµƒ ˝æ›◊™ªØ≥…InputStream
-            InputStream is = urlConn.getInputStream();
-            // Ω´InputStream◊™ªª≥…Bitmap
-            bitmap = BitmapFactory.decodeStream(is);
-            is.close();
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            System.out.println("[getNetWorkBitmap->]MalformedURLException");
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("[getNetWorkBitmap->]IOException");
-            e.printStackTrace();
+    private void addBitmapToMemeryCache(Bitmap bitmap) {
+        String cacheKey = mImageUrl;
+        if (getBitmapFromMemoryCache(cacheKey) == null){
+            mLruCache.put(cacheKey, bitmap);
         }
-        return bitmap;
     }
 
+    private Bitmap getBitmapFromMemoryCache(String cacheKey) {
+        return mLruCache.get(cacheKey);
+    }
 
     private InputStream loadImage() {
 
@@ -121,7 +124,7 @@ public class LoadImgByMemoryCacheActivity extends AppCompatActivity implements V
                 is = urlConnection.getInputStream();
             }*/
 
-            //–¥µΩ±æµÿ
+            //ÂÜôÂà∞Êú¨Âú∞
 
             return is;
         } catch (MalformedURLException e) {
@@ -133,10 +136,7 @@ public class LoadImgByMemoryCacheActivity extends AppCompatActivity implements V
     }
 
 
-    private Bitmap getBitmapFromMemoryCache(String cacheKey) {
 
-        return null;
-    }
 
     private Handler handler = new Handler();
 
@@ -165,5 +165,33 @@ public class LoadImgByMemoryCacheActivity extends AppCompatActivity implements V
             });
         }
     }
+
+    public static Bitmap getNetWorkBitmap(String urlString) {
+        URL imgUrl = null;
+        Bitmap bitmap = null;
+        try {
+            imgUrl = new URL(urlString);
+            // ‰ΩøÁî®HttpURLConnectionÊâìÂºÄËøûÊé•
+            HttpURLConnection urlConn = (HttpURLConnection) imgUrl
+                    .openConnection();
+            urlConn.setDoInput(true);
+            urlConn.connect();
+            // Â∞ÜÂæóÂà∞ÁöÑÊï∞ÊçÆËΩ¨ÂåñÊàêInputStream
+            InputStream is = urlConn.getInputStream();
+            // Â∞ÜInputStreamËΩ¨Êç¢ÊàêBitmap
+            bitmap = BitmapFactory.decodeStream(is);
+            is.close();
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            System.out.println("[getNetWorkBitmap->]MalformedURLException");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("[getNetWorkBitmap->]IOException");
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
+
+
 
 }
