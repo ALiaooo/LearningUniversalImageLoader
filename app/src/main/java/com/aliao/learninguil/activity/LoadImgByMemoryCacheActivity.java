@@ -135,9 +135,6 @@ public class LoadImgByMemoryCacheActivity extends AppCompatActivity implements V
         return null;
     }
 
-
-
-
     private Handler handler = new Handler();
 
     private void requestImage() {

@@ -30,7 +30,7 @@ public class App extends Application {
 
     public static LruCache getLruCache(){
         if (mLruCache == null){
-            mLruCache = DefaultConfigurationFactory.createMemoryCche();
+            mLruCache = DefaultConfigurationFactory.createMemoryCache();
         }
         return mLruCache;
     }
