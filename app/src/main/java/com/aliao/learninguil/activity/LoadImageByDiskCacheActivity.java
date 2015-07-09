@@ -73,7 +73,6 @@ public class LoadImageByDiskCacheActivity extends AppCompatActivity implements V
             super.handleMessage(msg);
             if (msg.what == 1){
                 readImageFromCache();
-
             }
         }
     };
