@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.aliao.learninguil.activity.ExecutorTestActivity;
+import com.aliao.learninguil.activity.LoadImageByDiskCacheActivity;
 import com.aliao.learninguil.activity.LoadImgByMemoryCacheActivity;
 
 
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         findViewById(R.id.btn_executor).setOnClickListener(this);
         findViewById(R.id.btn_memorycache).setOnClickListener(this);
+        findViewById(R.id.btn_disklrucache).setOnClickListener(this);
     }
 
     @Override
@@ -51,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_memorycache:
                 startActivity(new Intent(MainActivity.this, LoadImgByMemoryCacheActivity.class));
+                break;
+            case R.id.btn_disklrucache:
+                startActivity(new Intent(MainActivity.this, LoadImageByDiskCacheActivity.class));
                 break;
         }
     }

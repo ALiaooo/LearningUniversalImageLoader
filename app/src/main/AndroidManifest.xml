@@ -3,8 +3,11 @@
     package="com.aliao.learninguil" >
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
 
-    <application
+
+<application
         android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -21,7 +24,11 @@
         </activity>
 
         <activity android:name=".activity.ExecutorTestActivity"/>
-        <activity android:name=".activity.LoadImgByMemoryCacheActivity"/>
+        <activity android:name=".activity.LoadImgByMemoryCacheActivity"
+            android:label="@string/loadimg_memory"/>
+        <activity
+            android:name=".activity.LoadImageByDiskCacheActivity"
+            android:label="@string/loadimg_disk"/>
     </application>
 
 </manifest>

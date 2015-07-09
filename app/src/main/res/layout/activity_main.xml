@@ -20,5 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="使用memorycache缓存请求的图片"/>
+    <Button
+        android:id="@+id/btn_disklrucache"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="使用DiskLruCache缓存请求的图片"/>
 
 </LinearLayout>

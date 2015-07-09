@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">LearningUniversalImageLoader</string>
+    <string name="loadimg_memory">LoadImgByMemoryCacheActivity</string>
+    <string name="loadimg_disk">LoadImageByDiskCacheActivity</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
