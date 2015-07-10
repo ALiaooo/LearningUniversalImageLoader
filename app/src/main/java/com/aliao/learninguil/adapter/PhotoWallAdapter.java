@@ -22,6 +22,9 @@ import java.net.URL;
  * Created by 丽双 on 2015/7/9.
  *
  * 使用内存缓存实现图片墙 http://blog.csdn.net/guolin_blog/article/details/9526203
+ *
+ * 从源码分析Universal-Image-Loader的缓存机制
+ * http://www.cnblogs.com/kissazi2/p/3931400.html
  */
 public class PhotoWallAdapter extends BaseAdapter {
 
