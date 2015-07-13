@@ -13,4 +13,5 @@
         android:verticalSpacing="@dimen/image_thumbnail_spacing"
         ></GridView>
 
+
 </LinearLayout>

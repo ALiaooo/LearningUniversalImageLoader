@@ -29,6 +29,12 @@
         <activity
             android:name=".activity.LoadImageByDiskCacheActivity"
             android:label="@string/loadimg_disk"/>
+        <activity
+            android:name=".activity.PhotoWallActivity"
+            android:label="@string/photowall_memory"/>
+        <activity
+            android:name=".activity.PhotoListActivity"
+            android:label="@string/photowall_memory"/>
     </application>
 
 </manifest>

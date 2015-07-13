@@ -22,7 +22,7 @@ public class PhotoWallActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photowall);
         mGridView = (GridView) findViewById(R.id.photoWall);
-        mAdapter = new PhotoWallAdapter(Constants.IMAGES);
+        mAdapter = new PhotoWallAdapter(Constants.IMAGES, mGridView);
         mGridView.setAdapter(mAdapter);
     }
 

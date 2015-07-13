@@ -8,10 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.aliao.learninguil.R;
 import com.aliao.learninguil.utils.CacheUtil;
+import com.aliao.learninguil.utils.L;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -30,8 +32,10 @@ public class PhotoWallAdapter extends BaseAdapter {
 
     private String[] mImageUrls;
     private LruCache<String, Bitmap> mLruCache;
+    private GridView mGridView;
 
-    public PhotoWallAdapter(String[] imageUrls) {
+    public PhotoWallAdapter(String[] imageUrls, GridView gridView) {
+        mGridView = gridView;
         mImageUrls = imageUrls;
         int maxSize = CacheUtil.getAvailableMaxMemeryCache() / 8;//取手机最大可用内存的1/8
         mLruCache = new LruCache<>(maxSize);
@@ -64,9 +68,13 @@ public class PhotoWallAdapter extends BaseAdapter {
         }else {
             holder = (ViewHolder) convertView.getTag();
         }
+        holder.ivPhoto.setTag(imageUrl);
 
         //判断缓存中是否有图片
-        setPhotoView(imageUrl, holder.ivPhoto);
+//        setPhotoView(imageUrl, holder.ivPhoto);
+
+        L.d("position = "+position+", imageUrl = "+imageUrl);
+        loadBitmap(imageUrl);
 
         return convertView;
     }
@@ -92,29 +100,31 @@ public class PhotoWallAdapter extends BaseAdapter {
         private ImageView ivPhoto;
     }
 
-    private void loadBitmap(String imageUrl, ImageView ivPhoto) {
+    private void loadBitmap(final String imageUrl) {
 
-        new LoadImageAsyncTask().execute(imageUrl, ivPhoto);
-
+        new LoadImageAsyncTask().execute(imageUrl);
     }
 
     class LoadImageAsyncTask extends AsyncTask<Object, Void, Bitmap>{
 
+        private String mImageUrl;
+
         @Override
         protected Bitmap doInBackground(Object... params) {
-            String imageUrl = (String) params[0];
-            ImageView imageView = (ImageView) params[1];
-            Bitmap bitmap = doadloadImage(imageUrl);
-            mLruCache.put(imageUrl, bitmap);
+            mImageUrl = (String) params[0];
+            Bitmap bitmap = doadloadImage(mImageUrl);
+            mLruCache.put(mImageUrl, bitmap);
             return bitmap;
         }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
-
-            //
-
+            L.d("onPostExecute");
+            ImageView imageView = (ImageView) mGridView.findViewWithTag(mImageUrl);
+            if (imageView != null){
+                L.d("onPostExecute setImage = " + mImageUrl);
+                imageView.setImageBitmap(bitmap);}
         }
     }
 
