@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by 丽双 on 2015/7/13.
+ * Created by ALiao on 2015/7/13.
  */
 public class PhotoListActivity extends AppCompatActivity {
 

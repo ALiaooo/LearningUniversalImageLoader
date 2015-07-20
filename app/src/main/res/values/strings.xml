@@ -3,6 +3,7 @@
     <string name="loadimg_memory">LoadImgByMemoryCacheActivity</string>
     <string name="loadimg_disk">LoadImageByDiskCacheActivity</string>
     <string name="photowall_memory">PhotoWall</string>
+    <string name="photolist_memory">PhotoList</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

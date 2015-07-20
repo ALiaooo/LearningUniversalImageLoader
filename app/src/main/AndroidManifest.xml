@@ -34,7 +34,7 @@
             android:label="@string/photowall_memory"/>
         <activity
             android:name=".activity.PhotoListActivity"
-            android:label="@string/photowall_memory"/>
+            android:label="@string/photolist_memory"/>
     </application>
 
 </manifest>
