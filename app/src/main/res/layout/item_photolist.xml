@@ -6,7 +6,8 @@
     <ImageView
         android:id="@+id/iv_img"
         android:layout_width="100dp"
-        android:layout_height="100dp" />
+        android:layout_height="100dp"
+        android:src="@mipmap/empty_photo"/>
 
     <TextView
         android:id="@+id/tv_imagename"

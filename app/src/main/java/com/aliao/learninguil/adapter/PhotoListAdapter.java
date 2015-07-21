@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by 丽双 on 2015/7/13.
@@ -44,11 +46,17 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 
     private List<ImageInfo> imageInfos;
     private ListView mListView;
+    private int mFirstVisibleItem;
+    private int mVisibleItemCount;
+    private boolean mFirstEnter;
+    private Set<LoadImageAsyncTask> taskCollection;
 
     public PhotoListAdapter(List<ImageInfo> imageInfos, ListView listView) {
         this.imageInfos = imageInfos;
         mListView = listView;
         mListView.setOnScrollListener(this);
+        mFirstEnter = true;
+        taskCollection = new HashSet<>();
     }
 
     @Override
@@ -83,8 +91,8 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
         ImageInfo imageInfo = imageInfos.get(position);
         holder.imgName.setText(imageInfo.getName());
         holder.imgView.setTag(imageInfo.getUrl());
-        L.d("position = "+position+", url = "+imageInfo.getUrl());
-        loadAndSetImage(imageInfo.getUrl());
+//        L.d("position = "+position+", url = "+imageInfo.getUrl());
+//        loadAndSetImage(imageInfo.getUrl());
 
         return convertView;
     }
@@ -104,15 +112,44 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
          * scrollState = SCROLL_STATE_FLING( = 2 ) 手指做了抛的动作
          */
         L.d("-------》onScrollStateChanged scrollState = "+scrollState);
+        if (scrollState == SCROLL_STATE_IDLE){
+            loadAndSetImage(mFirstVisibleItem, mVisibleItemCount);
+        }else {
+            //当listview再次滑动时取消所有正在下载的任务
+            cancelAllTasks();
+        }
+    }
+
+    public void cancelAllTasks() {
+        if (taskCollection != null){
+            for (LoadImageAsyncTask task : taskCollection){
+                task.cancel(false);
+            }
+        }
     }
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        L.d("-------》onScroll firstVisibleItem = "+firstVisibleItem+", visibleItemCount = "+visibleItemCount+", totalItemCount = "+totalItemCount);
+        L.d("onScroll firstVisibleItem = "+firstVisibleItem+", visibleItemCount = "+visibleItemCount+", totalItemCount = "+totalItemCount);
+        mFirstVisibleItem = firstVisibleItem;//第一张可见图片的下标
+        mVisibleItemCount = visibleItemCount;//一屏可见图片的总数
+
+        //首次进入程序时，onScrollStateChanged方法并不会被调用，所以在这里首次进入程序时启动下载任务
+        if (mFirstEnter && visibleItemCount > 0){
+            loadAndSetImage(mFirstVisibleItem, mVisibleItemCount);
+            mFirstEnter = false;
+        }
+
     }
 
-    private void loadAndSetImage(String url) {
-        new LoadImageAsyncTask().execute(url);
+    private void loadAndSetImage(int firstVisibleItem, int visibleItemCount) {
+        for (int i = firstVisibleItem; i< firstVisibleItem + visibleItemCount; i++){
+            ImageInfo imageInfo = imageInfos.get(i);
+            L.d("position = "+i+", url = "+imageInfo.getUrl());
+            LoadImageAsyncTask task = new LoadImageAsyncTask();
+            task.execute(imageInfo.getUrl());
+            taskCollection.add(task);
+        }
     }
 
     class LoadImageAsyncTask extends AsyncTask<String, Void, Bitmap>{
