@@ -11,6 +11,7 @@ import android.widget.ListView;
 import com.aliao.learninguil.Constants;
 import com.aliao.learninguil.R;
 import com.aliao.learninguil.adapter.PhotoListAdapter;
+import com.aliao.learninguil.adapter.PhotoListAdapter2;
 import com.aliao.learninguil.entity.ImageInfo;
 import com.aliao.learninguil.utils.L;
 
@@ -26,11 +27,14 @@ import java.util.List;
  *
  * Android最佳性能实践(二)——分析内存的使用情况
  * http://blog.csdn.net/guolin_blog/article/details/42238633
+ *
+ * android 系统中可以在prop中配置dalvik堆的有关设定。具体设定由如下三个属性来控制
+ * http://blog.csdn.net/cqupt_chen/article/details/11068129
  */
 public class PhotoListActivity extends AppCompatActivity {
 
     private ListView mListView;
-    private PhotoListAdapter mAdapter;
+    private PhotoListAdapter2 mAdapter;
     private List<ImageInfo> mImageInfos = new ArrayList<>();
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
@@ -39,9 +43,11 @@ public class PhotoListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_photolist);
 
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        int heapgrowthlimit = manager.getMemoryClass();//可用堆内存，得到的是heapgrowthlimit的值
-        int heapSize = manager.getLargeMemoryClass();//进程内存空间分配的最大值
-        L.d("heapgrowthlimit = "+heapgrowthlimit+"M"+", heapsize = "+heapSize+"M");
+        //可用堆内存，单个应用可以使用的最大内存，如果应用内存使用超过这个值，就报OOM
+        int heapgrowthlimit = manager.getMemoryClass();
+        //进程内存空间分配的最大值，表示的是单个虚拟机可用的最大内存
+        int heapsize = manager.getLargeMemoryClass();
+        L.d("heapgrowthlimit = "+heapgrowthlimit+"m"+", heapsize = "+heapsize+"");
 
         for (int i = 0; i< Constants.IMAGES.length; i++){
             ImageInfo imageInfo = new ImageInfo();
@@ -50,7 +56,13 @@ public class PhotoListActivity extends AppCompatActivity {
             mImageInfos.add(imageInfo);
         }
         mListView = (ListView) findViewById(R.id.photoList);
-        mAdapter = new PhotoListAdapter(mImageInfos, mListView);
+        mAdapter = new PhotoListAdapter2(mImageInfos, mListView);
         mListView.setAdapter(mAdapter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mAdapter.cancelAllTasks();
     }
 }

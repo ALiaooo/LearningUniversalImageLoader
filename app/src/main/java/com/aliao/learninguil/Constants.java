@@ -13,7 +13,7 @@ public class Constants {
             "http://img.my.csdn.net/uploads/201407/26/1406383290_1042.jpg",
             "http://img.my.csdn.net/uploads/201407/26/1406383275_3977.jpg",
             "http://img.my.csdn.net/uploads/201407/26/1406383265_8550.jpg",
-            "http://img.my.csdn.net/uploads/201407/26/1406383264_3954.jpg",
+            "http://img.my.csdn.net/uploads/201407/26/1406383264_3954.jpg"/*,
             "http://img.my.csdn.net/uploads/201407/26/1406383264_4787.jpg",
             "http://img.my.csdn.net/uploads/201407/26/1406383264_8243.jpg",
             "http://img.my.csdn.net/uploads/201407/26/1406383248_3693.jpg",
@@ -51,7 +51,7 @@ public class Constants {
             "http://img.my.csdn.net/uploads/201407/26/1406382942_4881.jpg",
             "http://img.my.csdn.net/uploads/201407/26/1406382941_4559.jpg",
             "http://img.my.csdn.net/uploads/201407/26/1406382941_3845.jpg"
-            /*"http://img.my.csdn.net/uploads/201407/26/1406382924_8955.jpg",
+            "http://img.my.csdn.net/uploads/201407/26/1406382924_8955.jpg",
             "http://img.my.csdn.net/uploads/201407/26/1406382923_2141.jpg",
             "http://img.my.csdn.net/uploads/201407/26/1406382923_8437.jpg",
             "http://img.my.csdn.net/uploads/201407/26/1406382922_6166.jpg",

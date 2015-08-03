@@ -1,12 +1,13 @@
 package com.aliao.learninguil.adapter;
 
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -26,23 +27,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by 丽双 on 2015/7/13.
- *
- * 一、最原始的下载图片的方法
- * 没有设置item的高，图片的高，默认显示的是textview的高度，所以刚进入时一屏能够显示27个列表项，也就是说getView一开始调用了27次，那么线程也就创建了27个，下载了27张图片
- * 前几张图下载好后显示在屏幕上，根据图片的高度一屏只够显示5个，那么只保留显示在当前屏幕的convertView，之前创建的其他的convertView被回收了，通过findViewWithTag也就找不到imageurl对应的imageView。
- * （不止是请求过得要重新请求这种）由此可以看到不是屏幕显示多少张就去对应地进行多少次网络请求，事实上做了很多多余的网络请求。除了该情况外，当快速滑动列表时，那些被快速划过的item也要进行网络请求，这种一种资源浪费，既然不是用户要看的，为什么要去请求呢。
- * 所以接下来的主要目的就是避免多余的网络请求！
- * 1.图片高度设置的影响
- * 如果listview的item的高度是自动扩展的，比如没有设置item的高度或者imageView的高度，那进入列表页的时候，默认显示的高度就是textview的高度，当图片下载完毕，
- * 再显示在imageview中后，高度又扩展到他自己的大小。在这个过程中，一屏显示的item数是在变化的，因为textview的高度很小，一屏可以显示27个（举例），当图片现在完成显示完全后，一屏最终显示了6个item。
- * 如果提前已知item的显示高度，例如设置ImageView的高度为100dp，那么一屏能够显示的item数量是确定的，就可以做到一屏显示多少个item，进行相应数量的网络请求。
- *
- * 2.不想查看而被快速滑过去的图片
- * 对于我们不想查看而快速滑过的图片是没有必要浪费资源去加载的。但是由于把加载图片的操作放在了getView()中，只要滑动屏幕都会调用getView()，也就没法控制图片加载的时机。最好的做法就是，当listview滑动停止时再去加载。
- *
+ * Created by ALiao on 2015/7/27.
+ * 减少对象对内存的消耗
+ * 由于图片消耗的内存较大，所以这个类主要用来测试图片消耗内存的大小以及降低图片对内存消耗的方法
+ * 1.查看Bitmap占用内存的大小
+ * 2.如果图片实际尺寸比要显示的尺寸要大，可以通过压缩图片来减少内存的浪费
  */
-public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrollListener{
+public class PhotoListAdapter2 extends BaseAdapter implements AbsListView.OnScrollListener{
 
     private List<ImageInfo> imageInfos;
     private ListView mListView;
@@ -51,7 +42,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
     private boolean mFirstEnter;
     private Set<LoadImageAsyncTask> taskCollection;
 
-    public PhotoListAdapter(List<ImageInfo> imageInfos, ListView listView) {
+    public PhotoListAdapter2(List<ImageInfo> imageInfos, ListView listView) {
         this.imageInfos = imageInfos;
         mListView = listView;
         mListView.setOnScrollListener(this);
@@ -91,9 +82,6 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
         ImageInfo imageInfo = imageInfos.get(position);
         holder.imgName.setText(imageInfo.getName());
         holder.imgView.setTag(imageInfo.getUrl());
-//        L.d("position = "+position+", url = "+imageInfo.getUrl());
-//        loadAndSetImage(imageInfo.getUrl());
-
         return convertView;
     }
 
@@ -111,7 +99,6 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
          * scrollState = SCROLL_STATE_TOUCH_SCROLL( = 1 )正在滚动
          * scrollState = SCROLL_STATE_FLING( = 2 ) 手指做了抛的动作
          */
-        L.d("-------》onScrollStateChanged scrollState = "+scrollState);
         if (scrollState == SCROLL_STATE_IDLE){
             loadAndSetImage(mFirstVisibleItem, mVisibleItemCount);
         }else {
@@ -130,7 +117,6 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        L.d("onScroll firstVisibleItem = "+firstVisibleItem+", visibleItemCount = "+visibleItemCount+", totalItemCount = "+totalItemCount);
         mFirstVisibleItem = firstVisibleItem;//第一张可见图片的下标
         mVisibleItemCount = visibleItemCount;//一屏可见图片的总数
 
@@ -145,14 +131,13 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
     private void loadAndSetImage(int firstVisibleItem, int visibleItemCount) {
         for (int i = firstVisibleItem; i< firstVisibleItem + visibleItemCount; i++){
             ImageInfo imageInfo = imageInfos.get(i);
-            L.d("position = "+i+", url = "+imageInfo.getUrl());
             LoadImageAsyncTask task = new LoadImageAsyncTask();
             task.execute(imageInfo.getUrl());
             taskCollection.add(task);
         }
     }
 
-    class LoadImageAsyncTask extends AsyncTask<String, Void, Bitmap>{
+    class LoadImageAsyncTask extends AsyncTask<String, Void, Bitmap> {
 
         private String mImageUrl;
 
@@ -182,9 +167,24 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
         try {
             URL url = new URL(imageUrl);
             connection = (HttpURLConnection) url.openConnection();
-            bitmap = BitmapFactory.decodeStream(connection.getInputStream());
-//            bitmap.getByteCount()
-            L.d("------------------------------------loadBitmap ");
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            //防止第一次解析时对图片的内存分配
+            options.inJustDecodeBounds = true;
+            //第一次解析
+            BitmapFactory.decodeStream(connection.getInputStream(), null, options);
+            //decodeStream不能重复解析同一个网络流的inputStream，需要重新打开一次inputStream
+            connection.disconnect();
+            connection = (HttpURLConnection) url.openConnection();
+            //获取图片的缩放比例
+            options.inSampleSize = calculateInSampleSize(options,400, 400);
+            //将options.inJustDecodeBounds的值设回false，为了第二次解析能够正常分配内存
+            options.inJustDecodeBounds = false;
+            //第二次解析，此时图片的内存会按照压缩后的图片宽高去分配
+            bitmap = BitmapFactory.decodeStream(connection.getInputStream(), null, options);
+            L.d("loadBitmap url = "+imageUrl);
+            L.d("该图占用内存 = "+getBitmapSize(bitmap)+"bytes, "+(getBitmapSize(bitmap)/1024)+"KB"+", width = "+bitmap.getWidth()+", height = "+bitmap.getHeight()+", config = "+bitmap.getConfig().name());
+
             return bitmap;
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -196,6 +196,34 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
             }
         }
         return bitmap;
+    }
+
+    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        int width = options.outWidth;//原图的宽
+        int height = options.outHeight;//原图的高
+        int inSampleSize = 1;
+        if (height > reqHeight || width > reqWidth){
+            //计算出原图宽高和目标宽高的比例——缩小几倍
+            int heightRadio = Math.round((float)height / (float)reqHeight);
+            int widthRadio = Math.round((float)width / (float)reqWidth);
+            //选择宽和高中最小的比例作为inSampleSize的值，可以保证最终图片的宽和高一定都会大于等于目标的宽和高
+            inSampleSize = heightRadio < widthRadio ? heightRadio : widthRadio;
+        }
+        return inSampleSize;
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public int getBitmapSize(Bitmap bitmap){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){// API 19  Android 4.4
+            return bitmap.getAllocationByteCount();
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1){// API 12  Android 3.1
+            return bitmap.getByteCount();
+        }
+
+        return bitmap.getRowBytes() * bitmap.getHeight();
     }
 
 }
