@@ -12,6 +12,7 @@ import com.aliao.learninguil.Constants;
 import com.aliao.learninguil.R;
 import com.aliao.learninguil.adapter.PhotoListAdapter;
 import com.aliao.learninguil.adapter.PhotoListAdapter2;
+import com.aliao.learninguil.adapter.PhotoListUseExcutorAdapter;
 import com.aliao.learninguil.entity.ImageInfo;
 import com.aliao.learninguil.utils.L;
 
@@ -34,7 +35,8 @@ import java.util.List;
 public class PhotoListActivity extends AppCompatActivity {
 
     private ListView mListView;
-    private PhotoListAdapter2 mAdapter;
+//    private PhotoListAdapter mAdapter;
+    private PhotoListUseExcutorAdapter mAdapter;
     private List<ImageInfo> mImageInfos = new ArrayList<>();
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
@@ -56,7 +58,7 @@ public class PhotoListActivity extends AppCompatActivity {
             mImageInfos.add(imageInfo);
         }
         mListView = (ListView) findViewById(R.id.photoList);
-        mAdapter = new PhotoListAdapter2(mImageInfos, mListView);
+        mAdapter = new PhotoListUseExcutorAdapter(mImageInfos, mListView);
         mListView.setAdapter(mAdapter);
     }
 
